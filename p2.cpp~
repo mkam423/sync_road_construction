@@ -1,0 +1,369 @@
+// Mason Kam
+// p2.cpp
+
+
+#include<iostream>
+#include<cctype>
+#include<stdlib.h>
+#include<pthread.h>
+#include<time.h>
+#include<queue>
+#include<semaphore.h>
+#include<fstream>
+using namespace std;
+
+
+void *produceN(void *arg);
+void *produceS(void *arg);
+void *consumer(void *arg);
+int pthread_sleep(int seconds);
+void northCar();
+void southCar();
+void setupLogs();
+
+const int NEXT_CAR_CHANCE = 8;
+const int MAX_ROLL = 10;
+const unsigned FULL_LINE = 10;
+const int CLEAR = 50;
+const char YES = 'y';
+const char NO = 'n';
+const string CAR_FILE = "car.log";
+const string FLAG_FILE = "flagperson.log";
+
+
+pthread_mutex_t mutex_var;
+pthread_mutex_t north_mutex;
+pthread_mutex_t south_mutex;
+sem_t sem;
+queue <string> N;
+queue <string> S;
+int num;
+int done = false;
+ofstream carLog;
+ofstream flagLog;
+
+int main()
+{
+  pthread_t north, south, flag;
+  char run;
+  bool play = true;
+  //int value = -1;
+  
+  for(int i = 0; i < CLEAR; i++)
+	cout << endl;
+
+  cout << "Run program? (y/n): ";
+  cin >> run;
+
+  while(tolower(run) != YES && tolower(run) != NO){
+	cout << "Must enter y or n: ";
+	cin >> run;
+  }
+
+  //sem_getvalue(&sem, &value);
+  //cout << " Initial VALUE: " << value << endl;
+  
+  while(tolower(run) == YES){
+	cout << "Enter any character to exit." << endl;
+	cout << "Program will run shortly..." << endl;
+	
+	pthread_sleep(3);
+
+	setupLogs();
+    //srand(time(0));
+    //sem_init(&sem, 0, 0);
+
+	cout << "Creating threads..." << endl;
+	pthread_sleep(1);
+	
+	if(-1 == pthread_create(&flag, NULL, &consumer, NULL)){
+	  perror("pthread_create3");
+	  return -1;
+	}	
+    if(-1 == pthread_create(&north, NULL, &produceN, NULL)){
+	  perror("pthread_create1");
+	  return -1;
+    }
+    if(-1 == pthread_create(&south, NULL, &produceS, NULL)){
+	  perror("pthread_create2");
+	  return -1;
+    }
+  
+    while(play){
+	  cin >> run;
+	  play = false;
+    }
+	
+    done = true;
+	run = NO;
+
+	cout << "Waiting for threads to finish..." << endl;
+    pthread_join(north, NULL);
+	//cout << "Thread 1 done" << endl;
+    pthread_join(south, NULL);
+	//cout << "Thread 2 done." << endl;
+	sem_post(&sem);
+    pthread_join(flag, NULL);
+	//cout << "Thread 3 done." << endl;
+
+	carLog.close();
+	flagLog.close();
+	
+	sem_destroy(&sem);
+  }
+
+
+  cout << "Exiting program." << endl << endl << endl;
+  
+  return 0;
+}
+
+
+void setupLogs()
+{
+  carLog.open(CAR_FILE);
+  flagLog.open(FLAG_FILE);
+
+  carLog << "Contents will be printed in order of the following: " << endl;
+  carLog << "CarID, Direction, Arrival Time, Start Time, and End Time.";
+  carLog << endl << endl;
+
+  flagLog << "Contents will be printed in the format State and Time";
+  flagLog << endl << endl;
+
+  srand(time(0));
+  sem_init(&sem, 0, 0);
+}
+
+
+void *produceN(void *arg)
+{
+  int roll = 0;
+  time_t rawTime;
+  //int value;
+  
+  while(!done){
+	pthread_mutex_lock (&mutex_var);
+	pthread_mutex_lock(&north_mutex);
+
+	if(S.size() == 0 && N.size() == 0)
+	  sem_post(&sem);
+	
+	do {
+	  time(&rawTime);
+	  N.push(ctime(&rawTime));
+   	  roll = rand() % MAX_ROLL;
+   	} while(roll < NEXT_CAR_CHANCE);
+
+	pthread_mutex_unlock(&north_mutex);
+	
+	cout << "Number of cars from North: " << N.size() << endl;
+	//sem_getvalue(&sem,&value);
+	//cout << "nVALUE: " << value << endl;
+	//sem_getvalue(&sem, &value);
+	//cout << "nVALUE2: " << value << endl;
+	//while(value > 1)
+	//sem_wait(&sem);
+	//cout << "nVALUE1: " << value << endl;
+	pthread_mutex_unlock(&mutex_var);
+
+	
+	pthread_sleep(20);
+  }
+
+  // cout << "Exiting thread 1..." << endl;
+  
+  return 0;
+}
+
+
+void *produceS(void *arg)
+{
+  int roll = 0;
+  time_t rawTime;
+  //int value;
+  
+  while(!done){
+	pthread_mutex_lock (&mutex_var);
+	pthread_mutex_lock(&south_mutex);
+
+	if(S.size() == 0 && N.size() == 0)
+	  sem_post(&sem);
+	
+	do {
+	  time(&rawTime);
+	  S.push(ctime(&rawTime));
+	  roll = rand() % MAX_ROLL;
+	} while(roll < NEXT_CAR_CHANCE);
+	
+	pthread_mutex_unlock(&south_mutex);
+
+	cout << "Number of cars from South: " << S.size() << endl;
+	//sem_getvalue(&sem,&value);
+	//cout << "sVALUE: " << value << endl;
+	//sem_getvalue(&sem,&value);
+    //cout << "sVALUE2: " << value << endl;
+	//cout << "sVALUE1: " << value << endl;
+	pthread_mutex_unlock (&mutex_var);
+
+	
+	pthread_sleep(20);
+  }
+
+  //  cout << "Exiting thread 2..." << endl;
+
+  return 0;
+}
+
+void *consumer(void *arg)
+{
+  //int value;
+  time_t flagTime;
+
+  cout << endl << endl;
+  if(!done){
+  cout << "Flag person sleep." << endl;
+  time(&flagTime);
+  flagLog << "Sleep: " << ctime(&flagTime);
+  sem_wait(&sem);
+  }
+  
+  while(!done){
+	pthread_mutex_lock(&mutex_var);
+	cout << "Flag person awake." << endl;
+	pthread_mutex_unlock(&mutex_var);
+	time(&flagTime);
+	flagLog << " Awaken: " << ctime(&flagTime) << endl;
+	
+	while(N.size() > 0 || S.size() > 0){
+	  //Let one side through at a time
+	  if(N.size() < FULL_LINE && S.size() < FULL_LINE){
+		while(N.size() != 0){
+		  northCar();
+		  while(S.size() >= FULL_LINE) // Check if S has 10+ cars
+			southCar();
+		}
+		while(S.size() != 0){
+		  southCar();
+		  while(N.size() >= FULL_LINE) // Check if N has 10+ cars
+		    northCar();
+		}
+	  //South side 10+ cars
+	  } else if (S.size() >= FULL_LINE && N.size() < FULL_LINE){
+		while(S.size() != 0){
+		  southCar();
+   		  while(N.size() >= FULL_LINE) // Check if N has 10+ cars
+			northCar();
+		}
+	  //North side 10+ cars
+	  } else if (N.size() >= FULL_LINE && S.size() < FULL_LINE){
+		while(N.size() != 0){
+   		  northCar();
+		  while(S.size() >= FULL_LINE) // Check if N has 10+ cars
+			southCar();
+		}
+	  //Both sides 10+ cars
+      } else {
+		while(S.size() >= FULL_LINE)
+		  southCar();
+		while(N.size() >= FULL_LINE)
+		  northCar();
+	  }
+    }
+
+	
+	if(!done){
+	  cout << "Flag person sleep." << endl << endl << endl;
+	  //sem_getvalue(&sem, &value);
+	  //cout << "VAL: " << value << endl;
+
+	  time(&flagTime);
+	  flagLog << "Sleep: " << ctime(&flagTime);
+	  sem_wait(&sem);
+	}
+  }
+
+  //cout << "Exiting thread 3..." << endl;
+  
+  return 0;
+}
+
+
+void northCar()
+{
+  string carTime;
+  time_t rawTime;
+  
+  carTime = N.front();
+  
+  pthread_mutex_lock(&north_mutex);
+  N.pop();
+  pthread_mutex_unlock(&north_mutex);
+  
+  num++;
+  
+  cout << "Car " << num << " from N going through." << endl;
+  carLog << num << endl;
+  carLog << "N" << endl;
+  //cout << "Car arrival: " << carTime;
+  carLog << carTime;
+  time(&rawTime);
+  //cout << "Car run: " << ctime(&rawTime);
+  carLog << ctime(&rawTime);
+  
+  pthread_sleep(1);
+
+  time(&rawTime);
+  //cout << "Car done: " << ctime(&rawTime) << endl;
+  carLog << ctime(&rawTime) << endl;
+}
+
+
+void southCar()
+{
+  string carTime;
+  time_t rawTime;
+
+  carTime = S.front();
+
+  pthread_mutex_lock(&south_mutex);
+  S.pop();
+  pthread_mutex_unlock(&south_mutex);
+
+  num++;
+  
+  cout << "Car " << num << " from S going through." << endl;
+  carLog << num << endl;
+  carLog << "S" << endl;
+  // cout << "Car arrival: " << carTime;
+  carLog << carTime;
+  time(&rawTime);
+  //cout << "Car run: " << ctime(&rawTime);
+  carLog << ctime(&rawTime);
+  
+  pthread_sleep(1);
+
+  time(&rawTime);
+  //cout << "Car done: " << ctime(&rawTime) << endl;
+  carLog << ctime(&rawTime) << endl;
+}
+
+
+int pthread_sleep(int seconds)
+{
+  pthread_mutex_t mutex;
+  pthread_cond_t conditionVar;
+  struct timespec expireTime;
+
+  if(pthread_mutex_init(&mutex, NULL))
+	return -1;
+
+  if(pthread_cond_init(&conditionVar, NULL))
+	return -1;
+
+  expireTime.tv_sec = (unsigned int)time(NULL) + seconds;
+  expireTime.tv_nsec = 0;
+
+  return pthread_cond_timedwait(&conditionVar, &mutex, &expireTime);  
+}
+

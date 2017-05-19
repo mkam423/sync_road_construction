@@ -1,0 +1,9 @@
+Name: Mason Kam
+File: p2.cpp
+
+Description: Program creates three subthreads in addition to having the main
+		thread. The three threads control 2 producing queues and one
+		consumer queue. Is prompting the user and awaiting for an input
+		in order to end the program. The semaphore option is used over
+		the other option of condition variables and it is cleaned up,
+		or destroyed, at the end of the program. 

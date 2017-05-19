@@ -1,0 +1,18 @@
+Name: Mason Kam
+File: p2.cpp
+
+Description: Program creates three subthreads in addition to having the main
+		thread. The three threads control 2 producing queues and one
+		consumer queue. Is prompting the user and awaiting for an input
+		in order to end the program. The semaphore option is used over
+		the other option of condition variables and it is cleaned up,
+		or destroyed, at the end of the program. The program utilizes
+		the queue library in order to create standard queues for cars.
+		Queues take in string which, in this case, is the time string
+		in which a particular car enters this traffic and is later used
+		to specify arrival time later in the car.log. The flagperson
+		file has an indent on the awaken time in order to allow for
+		easier reading. The overall layout of the source code in p2.cpp
+		contains comments in more ambiguous areas so to clarify what
+		is being done in that particular section. Overall program is
+		easy to follow and has instructions for user to follow. 

@@ -1,0 +1,111 @@
+Contents will be printed in order of the following: 
+CarID, Direction, Arrival Time, Start Time, and End Time.
+
+1
+N
+Fri May  8 00:16:12 2015
+Fri May  8 00:16:12 2015
+Fri May  8 00:16:13 2015
+
+2
+N
+Fri May  8 00:16:12 2015
+Fri May  8 00:16:13 2015
+Fri May  8 00:16:14 2015
+
+3
+N
+Fri May  8 00:16:12 2015
+Fri May  8 00:16:14 2015
+Fri May  8 00:16:15 2015
+
+4
+N
+Fri May  8 00:16:12 2015
+Fri May  8 00:16:15 2015
+Fri May  8 00:16:16 2015
+
+5
+N
+Fri May  8 00:16:12 2015
+Fri May  8 00:16:16 2015
+Fri May  8 00:16:17 2015
+
+6
+S
+Fri May  8 00:16:12 2015
+Fri May  8 00:16:17 2015
+Fri May  8 00:16:18 2015
+
+7
+N
+Fri May  8 00:16:32 2015
+Fri May  8 00:16:32 2015
+Fri May  8 00:16:33 2015
+
+8
+N
+Fri May  8 00:16:32 2015
+Fri May  8 00:16:33 2015
+Fri May  8 00:16:34 2015
+
+9
+N
+Fri May  8 00:16:32 2015
+Fri May  8 00:16:34 2015
+Fri May  8 00:16:35 2015
+
+10
+S
+Fri May  8 00:16:32 2015
+Fri May  8 00:16:35 2015
+Fri May  8 00:16:36 2015
+
+11
+S
+Fri May  8 00:16:32 2015
+Fri May  8 00:16:36 2015
+Fri May  8 00:16:37 2015
+
+12
+N
+Fri May  8 00:16:52 2015
+Fri May  8 00:16:52 2015
+Fri May  8 00:16:53 2015
+
+13
+N
+Fri May  8 00:16:52 2015
+Fri May  8 00:16:53 2015
+Fri May  8 00:16:54 2015
+
+14
+N
+Fri May  8 00:16:52 2015
+Fri May  8 00:16:54 2015
+Fri May  8 00:16:55 2015
+
+15
+N
+Fri May  8 00:16:52 2015
+Fri May  8 00:16:55 2015
+Fri May  8 00:16:56 2015
+
+16
+N
+Fri May  8 00:16:52 2015
+Fri May  8 00:16:56 2015
+Fri May  8 00:16:57 2015
+
+17
+S
+Fri May  8 00:16:52 2015
+Fri May  8 00:16:57 2015
+Fri May  8 00:16:58 2015
+
+18
+S
+Fri May  8 00:16:52 2015
+Fri May  8 00:16:58 2015
+Fri May  8 00:16:59 2015
+
